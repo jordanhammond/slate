@@ -306,9 +306,68 @@ user_token | true | The user session token.
 You must replace `user_token` with the token value returned from login.
 </aside>
 
+## Set User Preferences
+
+```shell
+curl -X POST -d \
+     'user_token=1234abcd-1234-abcd-1234-1234abcd1234&language=en&notifications=true' \
+     https://txodds.com/api/set-preferences
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+   "message": "changed: 2", 
+   "success": true
+}
+```
+
+### HTTP Request
+
+`POST https://txodds.com/api/set-preferences`
+
+### URL Parameters
+
+
+Parameter | Required | Description | Options
+--------- | -------- | ----------- | -------
+user_token | true | The user session token. |
+language | false | The user's selected language. | en, it, zh
+notifications | false | Whether to receive push notifications | true, false
+
 
 ## Get User Profiles
 
+```shell
+curl -X POST -d \
+     'user_token=1234abcd-1234-abcd-1234-1234abcd1234' \
+     https://txodds.com/api/get-user-profiles
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
 
 > The above command returns JSON structured like this:
 
@@ -369,12 +428,26 @@ Parameter | Required | Description
 --------- | -------- | -----------
 user_token | true | The user session token.
 
-<aside class="warning">
-Yet to be documented
-</aside>
-
 
 ## Get User Profile
+
+```shell
+curl -X POST -d \
+     'user_token=1234abcd-1234-abcd-1234-1234abcd1234&profile_id=20277' \
+     https://txodds.com/api/get-user-profile
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
 
 > The above command returns JSON structured like this:
 
@@ -427,6 +500,16 @@ Parameter | Required | Description
 user_token | true | The user session token.
 profile_id | true | The Id of the user profile to load.
 
-<aside class="warning">
-Yet to be documented
-</aside>
+
+# Application Data
+
+## Load Initial App Data
+
+## Previews Information
+
+## OCI Reports Data
+
+## Team News Data
+
+
+
