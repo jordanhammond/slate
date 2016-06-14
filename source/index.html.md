@@ -1,14 +1,14 @@
 ---
-title: API Reference
+title: TXODDS Mobile API Reference
 
 language_tabs:
   - shell
-  - ruby
-  - python
+  - java
+  - ObjectiveC
   - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
+  - <a href='https://txodds.com/registers'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
 
 includes:
@@ -19,171 +19,414 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the TXODDS Mobile API! You can use this API to access our unique match information data including Previews, OCI Reports and Team News.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+API endpoints include support for authentication; new account registration; loading user information and updating user preferences.
 
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
 
 # Authentication
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+## Login
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl -X POST -d \
+     'login=demo-user&password=opensesame&device_id=device-123&device_type=ios' \
+     https://txodds.com/api/login
+```
+
+```java
+
+```
+
+```ObjectiveC
+
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+   "resp_status":{
+      "message":"OK",
+      "code":0,
+      "errors":null
+   },
+   "user_details":{
+      "login":"demo-user",
+      "email":"demo-user@txodds.com",
+      "first_name":"Demo",
+      "last_name":"User",
+      "country":"GB",
+      "locale":"en",
+      "subscriptions":[
+         {
+            "name":"TRADER",
+            "expiry":1502535462.0
+         }
+      ],
+      "user_token":"1234abcd-1234-abcd-1234-1234abcd1234",
+      "permissions":[
+         "g:pro",
+         "g:moves"
+      ],
+      "settings":{
+         "notifications":true,
+         "language":"en"
+      },
+      "profile_url":"http://txodds.com/profiles/demo-user"
+   }
 }
 ```
 
-This endpoint retrieves a specific kitten.
+This endpoint authenticates an existing user and returns all account information. 
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+Each user is only permitted to have 2 active registered devices for TXODDS mobile applications, this requires that when a login request is made the unique device Id of the user's handset is submitted.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`POST https://txodds.com/api/login`
+
+### Query Parameters
+
+Parameter | Required | Description | Options
+--------- | -------- | ----------- | -------
+login | true | The user's unique login name. | 
+password | true | The user's password |
+device_id | true | The unique device Id that the user is using. |
+device_type | true | The device operating system. | android, ios
+language | false | The language to choose upon login. | en, it, zh
+
+<aside class="notice">
+Remember — a user may only have 2 active registered devices. Do deactivate a device the user must log into their profile on the website https://txodds.com/
+</aside>
+
+## Register
+
+```shell
+curl -X POST -d \
+     'login=demo-user&email=demo-user@txodds.com&firstname=Demo&lastname=User&password=opensesame&device_id=device-123&device_type=ios' \
+     https://txodds.com/api/register
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+   "resp_status":{
+      "message":"OK",
+      "code":0,
+      "errors":null
+   },
+   "user_details":{
+      "login":"demo-user",
+      "email":"demo-user@txodds.com",
+      "first_name":"Demo",
+      "last_name":"User",
+      "country":"GB",
+      "locale":"en",
+      "subscriptions":[
+         {
+            "name":"TRADER",
+            "expiry":1502535462.0
+         }
+      ],
+      "user_token":"1234abcd-1234-abcd-1234-1234abcd1234",
+      "permissions":[
+         "g:pro",
+         "g:moves"
+      ],
+      "settings":{
+         "notifications":true,
+         "language":"en"
+      },
+      "profile_url":"http://txodds.com/profiles/demo-user"
+   }
+}
+```
+
+This endpoint will create a new user account at TXODDS. The user will be able to use this account to access all of TXODDS services.
+
+<aside class="notice">TXODDS users various product subscriptions to control access to certain data and products. By default a new user account without a subscription will be able to access the mobile app but will only have access to Previews data.</aside>
+
+### HTTP Request
+
+`POST https://txodds.com/api/register`
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+Parameter | Required | Description | Options
+--------- | -------- | ----------- | -------
+login | true | The user's unique login name. | 
+email | true | The user's email address |
+firstname | true | The user's first name |
+lastname | true | The user's last name or surname |
+password | true | The user's password |
+tel | false | The user's telephone number |
+country | false | 2 letter country code |
+device_id | true | The unique device Id that the user is using. |
+device_type | true | The device operating system. | android, ios
 
+
+## Subscribe Device
+
+```shell
+curl -X POST -d \
+     'user_token=1234abcd-1234-abcd-1234-1234abcd1234&device_token=ABCZXY42492384092&device_id=device-123&device_type=ios' \
+     https://txodds.com/api/subscribe-device
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{"success": true}
+```
+
+This endpoint will subscribe the user's device for push notifications produced by the server. When new content is created for the app, users can receive notification of this.
+
+It is recommended that this endpoint be called after each user login.
+
+### HTTP Request
+
+`POST https://txodds.com/api/subscribe-device`
+
+### URL Parameters
+
+Parameter | Required | Description | Options
+--------- | -------- | ----------- | -------
+user_token | true | The user session token. |
+device_token | true | The device's publish token |
+device_id | true | The unique device Id that the user is using. |
+device_type | true | The device operating system. | android, ios
+
+<aside class="notice">
+You must replace `user_token` with the token value returned from login.
+</aside>
+
+
+# User Information
+
+## Get User Details
+
+```shell
+curl -X POST -d \
+     'user_token=1234abcd-1234-abcd-1234-1234abcd1234' \
+     https://txodds.com/api/get-user-details
+```
+
+```java
+
+```
+
+```ObjectiveC
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+   "resp_status":{
+      "message":"OK",
+      "code":0,
+      "errors":null
+   },
+   "user_details":{
+      "login":"demo-user",
+      "email":"demo-user@txodds.com",
+      "first_name":"Demo",
+      "last_name":"User",
+      "country":"GB",
+      "locale":"en",
+      "subscriptions":[
+         {
+            "name":"TRADER",
+            "expiry":1502535462.0
+         }
+      ],
+      "user_token":"1234abcd-1234-abcd-1234-1234abcd1234",
+      "permissions":[
+         "g:pro",
+         "g:moves"
+      ],
+      "settings":{
+         "notifications":true,
+         "language":"en"
+      },
+      "profile_url":"http://txodds.com/profiles/demo-user"
+   }
+}
+```
+
+This endpoint returns the same user details information that is returned after a success login.
+
+
+### HTTP Request
+
+`POST https://txodds.com/api/get-user-details`
+
+### URL Parameters
+
+Parameter | Required | Description
+--------- | -------- | -----------
+user_token | true | The user session token.
+
+<aside class="notice">
+You must replace `user_token` with the token value returned from login.
+</aside>
+
+
+## Get User Profiles
+
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "resp_status": {
+        "message": "OK",
+        "code": 0,
+        "errors": null
+    },
+    "profiles": [
+        {
+            "is_active": false,
+            "id": 26,
+            "name": "All Bookmakers"
+        },
+        {
+            "is_active": true,
+            "id": 20268,
+            "name": "Good books"
+        },
+        {
+            "is_active": false,
+            "id": 20269,
+            "name": "Arbs"
+        },
+        {
+            "is_active": false,
+            "id": 20271,
+            "name": "default"
+        },
+        {
+            "is_active": false,
+            "id": 20272,
+            "name": "tennis"
+        },
+        {
+            "is_active": false,
+            "id": 20276,
+            "name": "Asian + Totals"
+        },
+        {
+            "is_active": false,
+            "id": 20277,
+            "name": "Italian Books"
+        }
+    ]
+}
+```
+
+### HTTP Request
+
+`POST https://txodds.com/api/get-user-profiles`
+
+### URL Parameters
+
+Parameter | Required | Description
+--------- | -------- | -----------
+user_token | true | The user session token.
+
+<aside class="warning">
+Yet to be documented
+</aside>
+
+
+## Get User Profile
+
+> The above command returns JSON structured like this:
+
+```json
+
+ {
+    "profile": {
+        "leagues": [],
+        "is_active": false,
+        "sort_order": null,
+        "odds_types": [],
+        "id": 20277,
+        "vs_at": null,
+        "name": "Italian Books",
+        "sports": [],
+        "books": [
+            109,
+            110,
+            126,
+            238,
+            291,
+            342,
+            413,
+            475,
+            567,
+            613
+        ],
+        "default_sport": "all",
+        "default_day": "today",
+        "widgets": [],
+        "display_format": "euro"
+    },
+    "resp_status": {
+        "message": "OK",
+        "code": 0,
+        "errors": null
+    }
+}
+```
+
+
+### HTTP Request
+
+`POST https://txodds.com/api/get-user-profile`
+
+### URL Parameters
+
+Parameter | Required | Description
+--------- | -------- | -----------
+user_token | true | The user session token.
+profile_id | true | The Id of the user profile to load.
+
+<aside class="warning">
+Yet to be documented
+</aside>
