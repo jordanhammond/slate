@@ -92,17 +92,37 @@ Each user is only permitted to have 2 active registered devices for TXODDS mobil
 
 ### Query Parameters
 
-Parameter | Required | Description | Options
---------- | -------- | ----------- | -------
-login | true | The user's unique login name. | 
-password | true | The user's password |
-device_id | true | The unique device Id that the user is using. |
-device_type | true | The device operating system. | android, ios
-language | false | The language to choose upon login. | en, it, zh
+Parameter | Type | Required | Description | Options
+--------- | ---- | -------- | ----------- | -------
+login | string | true | The user's unique login name. | 
+password | string | true | The user's password |
+device_id | string | true | The unique device Id that the user is using. |
+device_type | string | true | The device operating system. | android, ios
+language | string | false | The language to choose upon login. | en, it, zh
 
 <aside class="notice">
 Remember — a user may only have 2 active registered devices. Do deactivate a device the user must log into their profile on the website https://txodds.com/
 </aside>
+
+### Response Parameters
+
+The following response parameters are contained within the **user_details** response object:
+
+Parameter | Type | Description
+--------- | ---- | -----------
+login | string | The user's unique login name.
+email | string | The user's default email address.
+firstname | string | The user's first name.
+lastname | string | The user's surname.
+locale | string | 2 character string of the user's website locale, if user settings is empty this can be used to default the app language.
+user_token | string | The users's session token, this is required for all other endpoints.
+country | string | 2 character code representing the user's country.
+profile_url | string | Website URL to the user's profile page.
+permissions | array | *Deprecated, please ignore*
+settings | array | Key/Value pairs for user's app settings.  *language* defines the app language to use. *notifications* defines whether the user should receive push messages.
+subscriptions | array | List of users's subscriptions. If the user has **TRADER** they will be able to access OCI Reports & News. The API will not return this content if they do not have the correct permission.
+
+
 
 ## Register
 
@@ -170,17 +190,21 @@ This endpoint will create a new user account at TXODDS. The user will be able to
 
 ### URL Parameters
 
-Parameter | Required | Description | Options
---------- | -------- | ----------- | -------
-login | true | The user's unique login name. | 
-email | true | The user's email address |
-firstname | true | The user's first name |
-lastname | true | The user's last name or surname |
-password | true | The user's password |
-tel | false | The user's telephone number |
-country | false | 2 letter country code |
-device_id | true | The unique device Id that the user is using. |
-device_type | true | The device operating system. | android, ios
+Parameter | Type | Required | Description | Options
+--------- | ---- | -------- | ----------- | -------
+login | string | true | The user's unique login name. | 
+email | string | true | The user's email address |
+firstname | string | true | The user's first name |
+lastname | string | true | The user's last name or surname |
+password | string | true | The user's password |
+tel | string | false | The user's telephone number |
+country | string | false | 2 letter country code |
+device_id | string | true | The unique device Id that the user is using. |
+device_type | string | true | The device operating system. | android, ios
+
+### Response Parameters
+
+See [Login](#login) for response paramters. The same are returned for Register.
 
 
 ## Subscribe Device
@@ -219,16 +243,22 @@ It is recommended that this endpoint be called after each user login.
 
 ### URL Parameters
 
-Parameter | Required | Description | Options
---------- | -------- | ----------- | -------
-user_token | true | The user session token. |
-device_token | true | The device's publish token |
-device_id | true | The unique device Id that the user is using. |
-device_type | true | The device operating system. | android, ios
+Parameter | Type | Required | Description | Options
+--------- | ---- | -------- | ----------- | -------
+user_token | string | true | The user session token. |
+device_token | string | true | The device's publish token |
+device_id | string | true | The unique device Id that the user is using. |
+device_type | string | true | The device operating system. | android, ios
 
 <aside class="notice">
 You must replace `user_token` with the token value returned from login.
 </aside>
+
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+success | boolean | Whether the request was successful.
 
 
 # User Information
@@ -291,6 +321,8 @@ curl -X POST -d \
 
 This endpoint returns the same user details information that is returned after a success login.
 
+Use this endpoint any time that you want to refresh the user's personal information that is held on the device. There are no push notifications for any data changes made on the web or other devices.
+
 
 ### HTTP Request
 
@@ -298,13 +330,14 @@ This endpoint returns the same user details information that is returned after a
 
 ### URL Parameters
 
-Parameter | Required | Description
---------- | -------- | -----------
-user_token | true | The user session token.
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
 
-<aside class="notice">
-You must replace `user_token` with the token value returned from login.
-</aside>
+### Response Parameters
+
+See [Login](#login) for response paramters. The same are returned for Get User Details.
+
 
 ## Set User Preferences
 
@@ -335,18 +368,28 @@ curl -X POST -d \
 }
 ```
 
+This endpoint is used to update the server database with the user's chosen settings.
+
+Presently this can be used to set the user's chosen language and whether they wish to receive push notifications.
+
 ### HTTP Request
 
 `POST https://txodds.com/api/set-preferences`
 
 ### URL Parameters
 
+Parameter | Type | Required | Description | Options
+--------- | ---- | -------- | ----------- | -------
+user_token | string | true | The user session token. |
+language | string | false | The user's selected language. | en, it, zh
+notifications | boolean | false | Whether to receive push notifications | true, false
 
-Parameter | Required | Description | Options
---------- | -------- | ----------- | -------
-user_token | true | The user session token. |
-language | false | The user's selected language. | en, it, zh
-notifications | false | Whether to receive push notifications | true, false
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+success | boolean | Whether the request was successful.
+message | sting | A message containing the count of setting values that were changed.
 
 
 ## Get User Profiles
@@ -418,15 +461,30 @@ curl -X POST -d \
 }
 ```
 
+This endpoint returns all the user's bookmaker profiles. It returns a list of the user's profiles, each that can be loaded in full detail with [Get User Profile](#get-user-profile).
+
+<aside class="notice">This is not used in the Match Information apps. It is provided for the Odds Comparison app.</aside>
+
+
 ### HTTP Request
 
 `POST https://txodds.com/api/get-user-profiles`
 
 ### URL Parameters
 
-Parameter | Required | Description
---------- | -------- | -----------
-user_token | true | The user session token.
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
+
+### Response Parameters
+
+The following response parameters are contained within the **profiles** array response object:
+
+Parameter | Type | Description
+--------- | ---- | -----------
+id | integer | The profile's unique identifier.
+name | sting | The profile's name.
+is_active | boolean | Whether the profile is presently the one chosen for use by the user.
 
 
 ## Get User Profile
@@ -488,6 +546,17 @@ curl -X POST -d \
 }
 ```
 
+This endpoint returns the full details of a user's bookmaker profile.
+
+A profile consists of a lists of the following defined information:
+1. Bookmakers data to display
+2. Leagues to display
+3. Sports to display
+4. Odds Types to display
+5. Other display settings such as odds display format
+
+<aside class="notice">This is not used in the Match Information apps. It is provided for the Odds Comparison app.</aside>
+
 
 ### HTTP Request
 
@@ -499,6 +568,25 @@ Parameter | Required | Description
 --------- | -------- | -----------
 user_token | true | The user session token.
 profile_id | true | The Id of the user profile to load.
+
+### Response Parameters
+
+The following response parameters are contained within the **profile** response object:
+
+Parameter | Type | Description
+--------- | ---- | -----------
+id | integer | The profile's unique identifier.
+name | sting | The profile's name.
+is_active | boolean | Whether the profile is presently the one chosen for use by the user.
+books | array | Integer list of bookmaker identifiers.
+sports | array | Integer list of sport identifiers.
+leagues | array | Integer list of league identifiers.
+odds_types | array | Integer list of odds types identifiers.
+vs_at | string | whether events should be display as **vs** format (*default*), or American Team B at Team A.
+display_format | string | Odds display format. **decimal** = 1.20; **euro** = 120; **us** = 500.
+sort_order | string | The display order for lists of odds. **odds** = Best odds first; **name** = Bookmaker alphabetical.
+
+<aside class="notice">If any of the object identifier arrays are empty, this implies that all values should be used.</aside>
 
 
 # Application Data
@@ -575,22 +663,119 @@ curl -X POST -d \
 }
 ```
 
+This endpoint is used to load all the initial display data for **Match Information**. *Previews, OCI Reports, News*.
+
+If the user does not have a valid subscription for any of the data then the data objects for those types will be empty.
+
 ### HTTP Request
 
 `POST https://txodds.com/api/initial-data`
 
 ### URL Parameters
 
-Parameter | Required | Description
---------- | -------- | -----------
-user_token | true | The user session token.
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
+
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+previews | array | See [Previews](#previews-data) for response object definition.
+moves | array | See [OCI Reports](#oci-reports-data) for response object definition.
+news | array | See [Team News](#team-news-data) for response object definition.
 
 
 ## Previews Data
 
+TODO
+
+### HTTP Request
+
+`POST https://txodds.com/api/previews`
+
+### URL Parameters
+
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
+
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+id | integer | Unique identifier for the event preview.
+title | string | The title of the preview.
+description | string | Friendly description for the preview.
+league | string | Name of the league for the event. Mostly null.
+url | string | Web link to the preview on the TXODDS website.
+match_link | string | Web link to the event that the preview is written for. Sometimes null.
+event_date | long | Epoch date for the event's start time.
+body | string | HTML string of the event preview main content.
+created | long | Epoch date for when the preview was first created.
+created_by | string | Name of the preview author.
+updated | long | Epoch date for when the preview was last updated.
+
+
 ## OCI Reports Data
 
+TODO
+
+### HTTP Request
+
+`POST https://txodds.com/api/moves`
+
+### URL Parameters
+
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
+
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+id | integer | Unique identifier for the event OCI Report.
+title | string | The title of the OCI Report.
+description | string | Friendly description for the OCI Report.
+league | string | Name of the league for the event.
+url | string | Web link to the OCI Report on the TXODDS website.
+match_link | string | Web link to the event that the OCI Report is written for.
+event_date | long | Epoch date for the event's start time.
+body | string | HTML string of the event OCI Report main content.
+created | long | Epoch date for when the OCI Report was first created.
+created_by | string | Name of the OCI Report author.
+updated | long | Epoch date for when the OCI Report was last updated.
+
 ## Team News Data
+
+TODO
+
+### HTTP Request
+
+`POST https://txodds.com/api/moves`
+
+### URL Parameters
+
+Parameter | Type | Required | Description
+--------- | ---- | -------- | -----------
+user_token | string | true | The user session token.
+
+### Response Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+id | integer | Unique identifier for the event News Report.
+title | string | The title of the News Report.
+description | string | Friendly description for the News Report.
+league | string | Name of the league for the event.
+url | string | Web link to the News Report on the TXODDS website.
+match_link | string | Web link to the event that the News Report is written for.
+event_date | long | Epoch date for the event's start time.
+body | string | HTML string of the event News Report main content.
+created | long | Epoch date for when the News Report was first created.
+created_by | string | Name of the News Report author.
+updated | long | Epoch date for when the News Report was last updated.
 
 
 
